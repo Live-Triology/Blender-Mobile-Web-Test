@@ -1,4 +1,4 @@
-import { MeshObject, Vertex } from '../store/useBlenderStore';
+import type { MeshObject, Vertex } from '../store/useBlenderStore';
 
 export class IOEngine {
   public static parseOBJ(text: string): Omit<MeshObject, 'id' | 'position' | 'rotation' | 'scale' | 'material'> {

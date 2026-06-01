@@ -1,5 +1,6 @@
 import React from 'react';
-import { useBlenderStore, AnimationMode } from '../store/useBlenderStore';
+import { useBlenderStore } from '../store/useBlenderStore';
+import type { AnimationMode } from '../store/useBlenderStore';
 
 export const WorkspaceAnimation: React.FC = () => {
   const { animationMode, setAnimationMode, currentFrame, totalFrames, setCurrentFrame, isPlaying, setIsPlaying } = useBlenderStore();

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useBlenderStore, TransformMode } from '../store/useBlenderStore';
+import { useBlenderStore } from '../store/useBlenderStore';
+import type { TransformMode } from '../store/useBlenderStore';
 
 export const WorkspaceLayout: React.FC = () => {
   const transformMode = useBlenderStore((state) => state.transformMode);

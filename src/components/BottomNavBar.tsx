@@ -1,5 +1,6 @@
 import React from 'react';
-import { useBlenderStore, WorkspaceTab } from '../store/useBlenderStore';
+import { useBlenderStore } from '../store/useBlenderStore';
+import type { WorkspaceTab } from '../store/useBlenderStore';
 
 export const BottomNavBar: React.FC = () => {
   const currentTab = useBlenderStore((state) => state.currentTab);

@@ -1,4 +1,4 @@
-import { MeshObject, Vertex, Vector3D } from '../store/useBlenderStore';
+import type { MeshObject, Vertex, Vector3D } from '../store/useBlenderStore';
 
 export class GeometryEngine {
   private static generateUUID(): string {

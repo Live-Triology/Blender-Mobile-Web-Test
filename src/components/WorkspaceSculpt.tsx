@@ -1,5 +1,6 @@
 import React from 'react';
-import { useBlenderStore, SculptBrush } from '../store/useBlenderStore';
+import { useBlenderStore } from '../store/useBlenderStore';
+import type { SculptBrush } from '../store/useBlenderStore';
 
 export const WorkspaceSculpt: React.FC = () => {
   const { sculptBrush, setSculptBrush, brushRadius, setBrushRadius, brushStrength, setBrushStrength } = useBlenderStore();

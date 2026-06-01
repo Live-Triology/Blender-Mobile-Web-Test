@@ -1,4 +1,4 @@
-import { MeshObject, Vertex } from '../store/useBlenderStore';
+import type { MeshObject, Vertex } from '../store/useBlenderStore';
 
 export class WebEngine {
   private canvas: HTMLCanvasElement;

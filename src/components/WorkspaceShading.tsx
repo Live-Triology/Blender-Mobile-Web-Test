@@ -1,5 +1,6 @@
 import React from 'react';
-import { useBlenderStore, ShadingPreset } from '../store/useBlenderStore';
+import { useBlenderStore } from '../store/useBlenderStore';
+import type { ShadingPreset } from '../store/useBlenderStore';
 
 export const WorkspaceShading: React.FC = () => {
   const { shadingPreset, setShadingPreset, meshes, selectedObjectId } = useBlenderStore();

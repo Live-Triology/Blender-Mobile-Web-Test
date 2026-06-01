@@ -3,10 +3,25 @@ import { useBlenderStore } from '../store/useBlenderStore';
 import type { AnimationMode } from '../store/useBlenderStore';
 
 export const WorkspaceAnimation: React.FC = () => {
-  const { animationMode, setAnimationMode, currentFrame, totalFrames, setCurrentFrame, isPlaying, setIsPlaying } = useBlenderStore();
+  const animationMode = useBlenderStore((state) => state.animationMode);
+  const setAnimationMode = useBlenderStore((state) => state.setAnimationMode);
+  const currentFrame = useBlenderStore((state) => state.currentFrame);
+  const totalFrames = useBlenderStore((state) => state.totalFrames);
+  const setCurrentFrame = useBlenderStore((state) => state.setCurrentFrame);
+  const isPlaying = useBlenderStore((state) => state.isPlaying);
+  const setIsPlaying = useBlenderStore((state) => state.setIsPlaying);
+  const advanceFrame = useBlenderStore((state) => state.advanceFrame);
+
+  React.useEffect(() => {
+    if (!isPlaying) return undefined;
+    const interval = window.setInterval(() => {
+      advanceFrame();
+    }, 120);
+    return () => window.clearInterval(interval);
+  }, [isPlaying, advanceFrame]);
 
   const handleTimelineDrag = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentFrame(parseInt(e.target.value));
+    setCurrentFrame(parseInt(e.target.value, 10));
   };
 
   return (

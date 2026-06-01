@@ -3,7 +3,11 @@ import { useBlenderStore } from '../store/useBlenderStore';
 import type { ShadingPreset } from '../store/useBlenderStore';
 
 export const WorkspaceShading: React.FC = () => {
-  const { shadingPreset, setShadingPreset, meshes, selectedObjectId } = useBlenderStore();
+  const meshes = useBlenderStore((state) => state.meshes);
+  const selectedObjectId = useBlenderStore((state) => state.selectedObjectId);
+  const shadingPreset = useBlenderStore((state) => state.shadingPreset);
+  const setShadingPreset = useBlenderStore((state) => state.setShadingPreset);
+  const setMaterialProperties = useBlenderStore((state) => state.setMaterialProperties);
 
   const presets: { id: ShadingPreset; label: string; color: string }[] = [
     { id: 'default', label: 'Default Gray', color: 'bg-gray-500' },
@@ -14,14 +18,44 @@ export const WorkspaceShading: React.FC = () => {
   ];
 
   const activeMesh = meshes.find((m) => m.id === selectedObjectId) || meshes[0];
+  const [baseColor, setBaseColor] = React.useState('#b8b8b8');
+
+  React.useEffect(() => {
+    if (!activeMesh?.material?.baseColor) return;
+    const [r, g, b] = activeMesh.material.baseColor;
+    setBaseColor(
+      `#${[r, g, b]
+        .map((value) => Math.round(value * 255).toString(16).padStart(2, '0'))
+        .join('')}`
+    );
+  }, [activeMesh]);
+
+  const updateColor = (value: string) => {
+    const r = parseInt(value.slice(1, 3), 16) / 255;
+    const g = parseInt(value.slice(3, 5), 16) / 255;
+    const b = parseInt(value.slice(5, 7), 16) / 255;
+    setBaseColor(value);
+    setMaterialProperties(selectedObjectId, { baseColor: [r, g, b, activeMesh.material.baseColor[3]] });
+  };
+
+  const updateRoughness = (value: number) => {
+    setMaterialProperties(selectedObjectId, { roughness: value });
+  };
+
+  const updateMetallic = (value: number) => {
+    setMaterialProperties(selectedObjectId, { metallic: value });
+  };
 
   return (
     <div className="absolute inset-x-0 bottom-0 top-[40%] bg-[#212121] border-t border-[#1D1D1D] pointer-events-auto flex flex-col overflow-hidden pb-14">
       <div className="h-10 bg-[#303030] border-b border-[#1D1D1D] px-4 flex items-center justify-between">
-        <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Gesture Node Graph Surface</span>
-        <span className="text-[10px] bg-[#1D1D1D] px-2 py-0.5 rounded text-amber-500 font-mono">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.35em] text-gray-500">Shading</p>
+          <h2 className="text-sm font-semibold text-white">Material Editor</h2>
+        </div>
+        <div className="text-[10px] bg-[#1D1D1D] px-2 py-0.5 rounded text-amber-500 font-mono">
           Target: {activeMesh ? activeMesh.name : 'None'}
-        </span>
+        </div>
       </div>
 
       <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-[#141414] grid grid-cols-1 gap-4 items-start">
@@ -30,18 +64,45 @@ export const WorkspaceShading: React.FC = () => {
             <span className="text-xs font-bold text-[#E58E35]">Principled BSDF</span>
             <div className="w-3 h-3 bg-green-500 rounded-full" />
           </div>
-          <div className="space-y-2 text-xs">
-            <div className="flex items-center justify-between">
+          <div className="space-y-3 text-xs">
+            <div className="flex items-center justify-between gap-4">
               <span className="text-gray-400">Base Color</span>
-              <div className="w-8 h-4 rounded bg-gray-300 border border-[#1D1D1D]" />
+              <input
+                type="color"
+                value={baseColor}
+                onChange={(event) => updateColor(event.target.value)}
+                className="h-8 w-16 cursor-pointer rounded-lg border border-[#1D1D1D] bg-[#1D1D1D]"
+              />
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400">Metallic</span>
-              <span className="font-mono text-gray-300">0.000</span>
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-gray-400 text-xs">
+                <span>Metallic</span>
+                <span className="font-mono text-gray-300">{activeMesh.material.metallic.toFixed(2)}</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={activeMesh.material.metallic}
+                onChange={(e) => updateMetallic(parseFloat(e.target.value))}
+                className="w-full accent-[#E58E35] bg-[#1D1D1D] h-2 rounded-lg appearance-none"
+              />
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400">Roughness</span>
-              <span className="font-mono text-gray-300">0.500</span>
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-gray-400 text-xs">
+                <span>Roughness</span>
+                <span className="font-mono text-gray-300">{activeMesh.material.roughness.toFixed(2)}</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={activeMesh.material.roughness}
+                onChange={(e) => updateRoughness(parseFloat(e.target.value))}
+                className="w-full accent-[#E58E35] bg-[#1D1D1D] h-2 rounded-lg appearance-none"
+              />
             </div>
           </div>
         </div>

@@ -5,11 +5,29 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #212121;
+  min-height: 100vh;
+  background-color: #121212;
   color: #ffffff;
   user-select: none;
   -webkit-user-select: none;
+  touch-action: none;
+  overscroll-behavior: none;
   overflow: hidden;
+}
+
+#root,
+html {
+  min-height: 100%;
+}
+
+canvas {
+  touch-action: none;
+}
+
+button,
+input,
+label {
+  touch-action: manipulation;
 }
 
 input[type="range"]::-webkit-slider-thumb {

@@ -7,6 +7,8 @@ interface TouchState {
   startDistance: number;
   startAngle: number;
   isDragging: boolean;
+  moved: boolean;
+  startTime: number;
   lastTapTime: number;
 }
 
@@ -48,21 +50,13 @@ export function useTouchGestureProcessor(
     const handleTouchStart = (e: TouchEvent) => {
       e.preventDefault();
       const touches = e.touches;
+      touchState.current.moved = false;
+      touchState.current.startTime = window.performance.now();
 
       if (touches.length === 1) {
         touchState.current.startX = touches[0].clientX;
         touchState.current.startY = touches[0].clientY;
         touchState.current.isDragging = true;
-
-        const now = window.performance.now();
-        const delta = now - touchState.current.lastTapTime;
-        if (delta < 300) {
-          const rect = canvas.getBoundingClientRect();
-          const x = touches[0].clientX - rect.left;
-          const y = touches[0].clientY - rect.top;
-          cameraMatrices.raycastSelect(x, y);
-        }
-        touchState.current.lastTapTime = now;
       } else if (touches.length === 2) {
         touchState.current.startDistance = getDistance(touches[0], touches[1]);
         const mid = getMidpoint(touches[0], touches[1]);
@@ -76,13 +70,12 @@ export function useTouchGestureProcessor(
       if (!touchState.current.isDragging) return;
       e.preventDefault();
       const touches = e.touches;
+      touchState.current.moved = true;
 
       if (touches.length === 1) {
         const dx = touches[0].clientX - touchState.current.startX;
         const dy = touches[0].clientY - touchState.current.startY;
-        
         cameraMatrices.orbit(dx * 0.005, dy * 0.005);
-
         touchState.current.startX = touches[0].clientX;
         touchState.current.startY = touches[0].clientY;
       } else if (touches.length === 2) {
@@ -94,8 +87,7 @@ export function useTouchGestureProcessor(
         const mid = getMidpoint(touches[0], touches[1]);
         const dx = mid.x - touchState.current.startX;
         const dy = mid.y - touchState.current.startY;
-        cameraMatrices.pan(dx * 0.01, dy * 0.01);
-        
+        cameraMatrices.pan(dx * 0.012, dy * 0.012);
         touchState.current.startX = mid.x;
         touchState.current.startY = mid.y;
       }
@@ -104,7 +96,17 @@ export function useTouchGestureProcessor(
     const handleTouchEnd = (e: TouchEvent) => {
       e.preventDefault();
       if (e.touches.length === 0) {
+        const endTime = window.performance.now();
+        const duration = endTime - touchState.current.startTime;
+        const moved = touchState.current.moved;
         touchState.current.isDragging = false;
+
+        if (!moved && duration < 250) {
+          const rect = canvas.getBoundingClientRect();
+          const x = touchState.current.startX - rect.left;
+          const y = touchState.current.startY - rect.top;
+          cameraMatrices.raycastSelect(x, y);
+        }
       } else if (e.touches.length === 1) {
         touchState.current.startX = e.touches[0].clientX;
         touchState.current.startY = e.touches[0].clientY;
